@@ -34,6 +34,8 @@ namespace PS.Plot.ArcgisFrameWork.Utils
                         return false;
                     }
                 }
+                ////盗版使用的授权
+                licenseStatus = aoInitialize.Initialize(esriLicenseProductCode.esriLicenseProductCodeArcServer);
             }
             catch (Exception ex)
             { 
@@ -67,6 +69,8 @@ namespace PS.Plot.ArcgisFrameWork.Utils
                         return false;
                     }
                 }
+                ////盗版使用的授权
+                licenseStatus = aoInitialize.Initialize(esriLicenseProductCode.esriLicenseProductCodeArcServer);
                 // 迁出空间分析扩展模块
                 if (isLoadSpatialAnalyst)
                 {

@@ -545,5 +545,66 @@ namespace PS.Plot.ArcgisFrameWork.Utils
             }
             return result;
         }
+
+        /// <summary>
+        /// 通过连接字符串，获取SDE数据库连接
+        /// </summary>
+        /// <param name="sConnStr"></param>
+        /// <returns></returns>
+        public IWorkspace OpenSDEFromString(string sConnStr)
+        {
+            if (string.IsNullOrEmpty(sConnStr))
+            {
+                return null;
+            }
+            try
+            {
+                Type factoryType = Type.GetTypeFromProgID("esriDataSourcesGDB.SdeWorkspaceFactory");
+                IWorkspaceFactory2 workspaceFactory2 = (IWorkspaceFactory2)Activator.CreateInstance(factoryType);
+                return workspaceFactory2.OpenFromString(sConnStr, 0);
+            }
+            catch (Exception ep)
+            {
+                ErrorMessage = "获取SDE数据库连接失败"+ ep.Message;
+                return null;
+            }
+        }
+
+        public ITable OpenTable(IWorkspace space, string tableName, string dtName=null)
+        {
+            if (string.IsNullOrEmpty(dtName))
+            {
+                IEnumDataset dts = space.get_Datasets(esriDatasetType.esriDTTable);
+                IDataset dataset = dts.Next();
+                while (dataset != null)
+                {
+                    if (dataset.Name.ToUpper().Contains(tableName.ToUpper()))
+                        return dataset as ITable;
+                    dataset = dts.Next();
+                }
+                return null;
+            }
+            else
+            {
+                IEnumDataset dts = space.get_Datasets(esriDatasetType.esriDTLasDataset);
+                IDataset parentDt = dts.Next();
+                while (parentDt != null)
+                {
+                    if (parentDt.Name.Equals(dtName))
+                    {
+                        IEnumDataset subset = parentDt.Subsets;
+                        IDataset dataset = subset.Next();
+                        while (dataset != null)
+                        {
+                            if (dataset.Name.Equals(tableName))
+                                return dataset as ITable;
+                            dataset = subset.Next();
+                        }
+                    }
+                    parentDt = dts.Next();
+                }
+                return null;
+            }
+        }
     }
 }
